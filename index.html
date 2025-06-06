@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Trivia Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --correct: #4cc9f0;
+            --wrong: #f72585;
+            --timer: #f8961e;
+            --card-bg: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --category-general: #4361ee;
+            --category-science: #3a86ff;
+            --category-history: #7209b7;
+            --category-geography: #38b000;
+            --category-entertainment: #f72585;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(247, 37, 133, 0.1) 0%, transparent 20%);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(2.5rem, 8vw, 3.5rem);
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            color: var(--secondary);
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .game-area {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+
+        .setup-screen {
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .setup-title {
+            font-size: clamp(1.5rem, 6vw, 1.8rem);
+            margin-bottom: 2rem;
+            color: var(--primary);
+            position: relative;
+        }
+
+        .setup-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+
+        .setup-options {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option-group h3 {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.4);
+            background-color: var(--primary-light);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-lg {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .category-general {
+            border-color: var(--category-general);
+            color: var(--category-general);
+        }
+
+        .category-general:hover {
+            background-color: var(--category-general);
+        }
+
+        .category-science {
+            border-color: var(--category-science);
+            color: var(--category-science);
+        }
+
+        .category-science:hover {
+            background-color: var(--category-science);
+        }
+
+        .category-history {
+            border-color: var(--category-history);
+            color: var(--category-history);
+        }
+
+        .category-history:hover {
+            background-color: var(--category-history);
+        }
+
+        .category-geography {
+            border-color: var(--category-geography);
+            color: var(--category-geography);
+        }
+
+        .category-geography:hover {
+            background-color: var(--category-geography);
+        }
+
+        .category-entertainment {
+            border-color: var(--category-entertainment);
+            color: var(--category-entertainment);
+        }
+
+        .category-entertainment:hover {
+            background-color: var(--category-entertainment);
+        }
+
+        .question-container {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .progress {
+            font-weight: 600;
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timer {
+            font-weight: 600;
+            color: var(--timer);
+            background-color: rgba(248, 150, 30, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .question {
+            font-size: clamp(1.2rem, 5vw, 1.5rem);
+            margin-bottom: 2rem;
+            font-weight: 600;
+            line-height: 1.4;
+            background-color: rgba(67, 97, 238, 0.05);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border-left: 5px solid var(--primary);
+            position: relative;
+        }
+
+        .question-category {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background-color: var(--light);
+            border: 2px solid rgba(67, 97, 238, 0.3);
+            padding: 1.2rem 1.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .option-btn.disabled {
+            cursor: not-allowed;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct);
+            color: white;
+            border-color: var(--correct);
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong);
+            color: white;
+            border-color: var(--wrong);
+        }
+
+        .option-icon {
+            width: 30px;
+            height: 30px;
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .skip-btn {
+            background-color: var(--gray);
+            color: white;
+        }
+
+        .skip-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .back-btn {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #2a2f9e;
+        }
+
+        .next-btn {
+            display: none;
+            margin: 0 auto;
+            animation: pulse 2s infinite;
+        }
+
+        .results-container {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .results-container h2 {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-size: clamp(1.5rem, 6vw, 2rem);
+        }
+
+        .final-score {
+            font-size: clamp(2rem, 8vw, 2.5rem);
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .performance-comment {
+            font-size: clamp(1.1rem, 4vw, 1.3rem);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .trophy {
+            font-size: clamp(3rem, 10vw, 5rem);
+            margin-bottom: 1.5rem;
+            color: var(--timer);
+            animation: bounce 2s infinite;
+        }
+
+        .answers-summary {
+            text-align: left;
+            max-width: 800px;
+            margin: 2rem auto;
+            background-color: rgba(67, 97, 238, 0.05);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+        }
+
+        .answer-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+        }
+
+        .answer-item.correct {
+            border-left: 4px solid var(--correct);
+            padding-left: 1rem;
+        }
+
+        .answer-item.wrong {
+            border-left: 4px solid var(--wrong);
+            padding-left: 1rem;
+        }
+
+        .answer-question {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .answer-user {
+            color: var(--wrong);
+            font-weight: 500;
+        }
+
+        .answer-correct {
+            color: var(--correct);
+            font-weight: 500;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent);
+            opacity: 0;
+            animation: confetti-fall 5s ease-in-out forwards;
+            z-index: 1000;
+            border-radius: 50%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--dark);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .category-icon {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .game-area {
+                padding: 1.5rem;
+            }
+            
+            .question {
+                padding: 1rem;
+            }
+            
+            .option-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Ultimate Trivia</div>
+            <p class="subtitle">Test your knowledge and challenge yourself!</p>
+        </header>
+
+        <div class="game-area">
+            <!-- Setup Screen -->
+            <div class="setup-screen" id="setupScreen">
+                <h2 class="setup-title">Game Setup</h2>
+                <div class="setup-options">
+                    <div class="option-group">
+                        <h3><i class="fas fa-tags category-icon"></i> Select Category</h3>
+                        <div class="option-buttons" id="categorySelect">
+                            <button class="btn btn-outline category-general" data-category="general">
+                                <i class="fas fa-globe"></i> General
+                            </button>
+                            <button class="btn btn-outline category-science" data-category="science">
+                                <i class="fas fa-flask"></i> Science
+                            </button>
+                            <button class="btn btn-outline category-history" data-category="history">
+                                <i class="fas fa-landmark"></i> History
+                            </button>
+                            <button class="btn btn-outline category-geography" data-category="geography">
+                                <i class="fas fa-map-marked-alt"></i> Geography
+                            </button>
+                            <button class="btn btn-outline category-entertainment" data-category="entertainment">
+                                <i class="fas fa-film"></i> Entertainment
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <h3><i class="fas fa-question-circle category-icon"></i> Number of Questions</h3>
+                        <div class="option-buttons" id="questionCountSelect">
+                            <button class="btn btn-outline" data-count="10">
+                                <i class="fas fa-list-ol"></i> 10
+                            </button>
+                            <button class="btn btn-outline" data-count="20">
+                                <i class="fas fa-list-ol"></i> 20
+                            </button>
+                            <button class="btn btn-outline" data-count="30">
+                                <i class="fas fa-list-ol"></i> 30
+                            </button>
+                            <button class="btn btn-outline" data-count="50">
+                                <i class="fas fa-list-ol"></i> 50
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg" id="startGameBtn">
+                    <i class="fas fa-play"></i> Start Game
+                </button>
+            </div>
+
+            <!-- Question Screen -->
+            <div class="question-container" id="questionContainer">
+                <div class="question-header">
+                    <div class="progress" id="progress">
+                        <i class="fas fa-list-ol"></i> Question 1 of 10
+                    </div>
+                    <div class="timer" id="timer">
+                        <i class="fas fa-clock"></i> <span id="timeLeft">30s</span>
+                    </div>
+                </div>
+                <div class="question" id="question">
+                    <div class="question-category" id="questionCategory">General</div>
+                </div>
+                <div class="options" id="options"></div>
+                <div class="navigation-buttons">
+                    <button class="btn back-btn" id="backBtn">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn skip-btn" id="skipBtn">
+                        <i class="fas fa-forward"></i> Skip
+                    </button>
+                </div>
+                <button class="btn btn-primary next-btn" id="nextBtn">
+                    <i class="fas fa-arrow-right"></i> Next Question
+                </button>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="results-container" id="resultsContainer">
+                <div class="trophy">🏆</div>
+                <h2>Quiz Completed!</h2>
+                <div class="final-score" id="finalScore"></div>
+                <div class="performance-comment" id="performanceComment"></div>
+                
+                <div class="answers-summary" id="answersSummary">
+                    <h3><i class="fas fa-clipboard-list"></i> Your Answers:</h3>
+                    <!-- Answers will be inserted here -->
+                </div>
+                
+                <button class="btn btn-primary btn-lg" id="restartBtn">
+                    <i class="fas fa-redo"></i> Play Again
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Ultimate Trivia Challenge &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        // Game variables
+        let selectedCategory = '';
+        let questionCount = 10;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timer;
+        let timeLeft = 30;
+        let questions = [];
+        let answered = false;
+        let userAnswers = [];
+
+        // DOM elements
+        const setupScreen = document.getElementById('setupScreen');
+        const categorySelect = document.getElementById('categorySelect');
+        const questionCountSelect = document.getElementById('questionCountSelect');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const questionContainer = document.getElementById('questionContainer');
+        const progress = document.getElementById('progress');
+        const timeLeftElement = document.getElementById('timeLeft');
+        const questionElement = document.getElementById('question');
+        const questionCategoryElement = document.getElementById('questionCategory');
+        const optionsElement = document.getElementById('options');
+        const backBtn = document.getElementById('backBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const finalScoreElement = document.getElementById('finalScore');
+        const performanceCommentElement = document.getElementById('performanceComment');
+        const answersSummaryElement = document.getElementById('answersSummary');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // Category icons and colors
+        const categoryStyles = {
+            general: { icon: 'fa-globe', color: 'var(--category-general)', name: 'General' },
+            science: { icon: 'fa-flask', color: 'var(--category-science)', name: 'Science' },
+            history: { icon: 'fa-landmark', color: 'var(--category-history)', name: 'History' },
+            geography: { icon: 'fa-map-marked-alt', color: 'var(--category-geography)', name: 'Geography' },
+            entertainment: { icon: 'fa-film', color: 'var(--category-entertainment)', name: 'Entertainment' }
+        };
+
+        // Question database with 50 questions per category
+        const questionDatabase = {
+            general: [
+                // 50 general knowledge questions
+                {
+                    question: "What is the capital of France?",
+                    options: ["London", "Berlin", "Paris", "Madrid"],
+                    answer: "Paris"
+                },
+                {
+                    question: "Which planet is known as the Red Planet?",
+                    options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                    answer: "Mars"
+                },
+                {
+                    question: "What is the largest mammal in the world?",
+                    options: ["Elephant", "Blue Whale", "Giraffe", "Polar Bear"],
+                    answer: "Blue Whale"
+                },
+                {
+                    question: "Which country is home to the kangaroo?",
+                    options: ["New Zealand", "South Africa", "Australia", "Brazil"],
+                    answer: "Australia"
+                },
+                {
+                    question: "What is the chemical symbol for gold?",
+                    options: ["Go", "Gd", "Au", "Ag"],
+                    answer: "Au"
+                },
+                {
+                    question: "How many continents are there on Earth?",
+                    options: ["5", "6", "7", "8"],
+                    answer: "7"
+                },
+                {
+                    question: "What is the largest ocean on Earth?",
+                    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
+                    answer: "Pacific"
+                },
+                {
+                    question: "Which language has the most native speakers?",
+                    options: ["English", "Spanish", "Mandarin", "Hindi"],
+                    answer: "Mandarin"
+                },
+                {
+                    question: "What is the tallest mountain in the world?",
+                    options: ["K2", "Kilimanjaro", "Everest", "Denali"],
+                    answer: "Everest"
+                },
+                {
+                    question: "Which gas do plants absorb from the atmosphere?",
+                    options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+                    answer: "Carbon Dioxide"
+                },
+                {
+                    question: "What is the hardest natural substance on Earth?",
+                    options: ["Gold", "Iron", "Diamond", "Quartz"],
+                    answer: "Diamond"
+                },
+                {
+                    question: "Which country invented tea?",
+                    options: ["India", "China", "Japan", "England"],
+                    answer: "China"
+                },
+                {
+                    question: "What is the most spoken language in the world?",
+                    options: ["English", "Mandarin", "Spanish", "Hindi"],
+                    answer: "Mandarin"
+                },
+                {
+                    question: "Which animal has the longest lifespan?",
+                    options: ["Elephant", "Galapagos Tortoise", "Bowhead Whale", "Greenland Shark"],
+                    answer: "Greenland Shark"
+                },
+                {
+                    question: "What is the smallest country in the world?",
+                    options: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"],
+                    answer: "Vatican City"
+                },
+                {
+                    question: "Which planet has the most moons?",
+                    options: ["Jupiter", "Saturn", "Uranus", "Neptune"],
+                    answer: "Saturn"
+                },
+                {
+                    question: "What is the fastest land animal?",
+                    options: ["Lion", "Cheetah", "Pronghorn Antelope", "Quarter Horse"],
+                    answer: "Cheetah"
+                },
+                {
+                    question: "Which country has the most time zones?",
+                    options: ["USA", "Russia", "France", "China"],
+                    answer: "France"
+                },
+                {
+                    question: "What is the most abundant gas in Earth's atmosphere?",
+                    options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Argon"],
+                    answer: "Nitrogen"
+                },
+                {
+                    question: "Which blood type is the universal donor?",
+                    options: ["A", "B", "AB", "O"],
+                    answer: "O"
+                },
+                {
+                    question: "What is the only sea without any coasts?",
+                    options: ["Sargasso Sea", "Mediterranean Sea", "Caribbean Sea", "Red Sea"],
+                    answer: "Sargasso Sea"
+                },
+                {
+                    question: "Which country has the most natural lakes?",
+                    options: ["Canada", "Russia", "USA", "Finland"],
+                    answer: "Canada"
+                },
+                {
+                    question: "What is the study of mushrooms called?",
+                    options: ["Mycology", "Entomology", "Botany", "Zoology"],
+                    answer: "Mycology"
+                },
+                {
+                    question: "Which planet rotates on its side?",
+                    options: ["Venus", "Mars", "Uranus", "Neptune"],
+                    answer: "Uranus"
+                },
+                {
+                    question: "What is the name of the fictional town where most of William Faulkner's novels are set?",
+                    options: ["Maycomb", "Yoknapatawpha", "Gotham", "Middleton"],
+                    answer: "Yoknapatawpha"
+                },
+                {
+                    question: "Which African country was formerly known as Abyssinia?",
+                    options: ["Ethiopia", "Sudan", "Kenya", "Tanzania"],
+                    answer: "Ethiopia"
+                },
+                {
+                    question: "What is the only letter that doesn't appear in any U.S. state name?",
+                    options: ["Q", "X", "Z", "J"],
+                    answer: "Q"
+                },
+                {
+                    question: "Which mountain range separates Europe from Asia?",
+                    options: ["Alps", "Andes", "Himalayas", "Ural Mountains"],
+                    answer: "Ural Mountains"
+                },
+                {
+                    question: "What is the only bone in the human body not connected to another bone?",
+                    options: ["Femur", "Hyoid", "Patella", "Scapula"],
+                    answer: "Hyoid"
+                },
+                {
+                    question: "Which country has the most islands?",
+                    options: ["Indonesia", "Philippines", "Sweden", "Canada"],
+                    answer: "Sweden"
+                },
+                {
+                    question: "What is the only country that borders both the Atlantic and Indian Oceans?",
+                    options: ["South Africa", "Namibia", "Angola", "Mozambique"],
+                    answer: "South Africa"
+                },
+                {
+                    question: "Which country has the most volcanoes?",
+                    options: ["Indonesia", "Japan", "USA", "Chile"],
+                    answer: "USA"
+                },
+                {
+                    question: "What is the name of the world's largest coral reef system?",
+                    options: ["Great Barrier Reef", "Belize Barrier Reef", "New Caledonia Barrier Reef", "Red Sea Coral Reef"],
+                    answer: "Great Barrier Reef"
+                },
+                {
+                    question: "Which country has the longest coastline?",
+                    options: ["Russia", "Canada", "USA", "Australia"],
+                    answer: "Canada"
+                },
+                {
+                    question: "What is the saltiest sea in the world?",
+                    options: ["Dead Sea", "Red Sea", "Mediterranean Sea", "Caspian Sea"],
+                    answer: "Dead Sea"
+                },
+                {
+                    question: "Which country is the largest producer of coffee?",
+                    options: ["Colombia", "Brazil", "Vietnam", "Ethiopia"],
+                    answer: "Brazil"
+                },
+                {
+                    question: "What is the only continent without reptiles or snakes?",
+                    options: ["Australia", "Antarctica", "Europe", "North America"],
+                    answer: "Antarctica"
+                },
+                {
+                    question: "Which country has the most official languages?",
+                    options: ["India", "South Africa", "Switzerland", "Bolivia"],
+                    answer: "Bolivia"
+                },
+                {
+                    question: "What is the flattest continent?",
+                    options: ["Africa", "Australia", "Antarctica", "Europe"],
+                    answer: "Australia"
+                },
+                {
+                    question: "Which country has the most UNESCO World Heritage Sites?",
+                    options: ["China", "Italy", "Spain", "France"],
+                    answer: "Italy"
+                },
+                {
+                    question: "What is the largest desert in the world?",
+                    options: ["Sahara", "Arabian", "Gobi", "Antarctic"],
+                    answer: "Antarctic"
+                },
+                {
+                    question: "Which planet is closest to the Sun?",
+                    options: ["Venus", "Mercury", "Earth", "Mars"],
+                    answer: "Mercury"
+                },
+                {
+                    question: "What is the main gas that makes up the Earth's atmosphere?",
+                    options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+                    answer: "Nitrogen"
+                },
+                {
+                    question: "What is the largest organ in the human body?",
+                    options: ["Liver", "Brain", "Skin", "Heart"],
+                    answer: "Skin"
+                },
+                {
+                    question: "Which scientist proposed the theory of relativity?",
+                    options: ["Isaac Newton", "Albert Einstein", "Galileo Galilei", "Stephen Hawking"],
+                    answer: "Albert Einstein"
+                },
+                {
+                    question: "What is the boiling point of water in Celsius?",
+                    options: ["90°", "100°", "110°", "120°"],
+                    answer: "100°"
+                },
+                {
+                    question: "Which element has the atomic number 1?",
+                    options: ["Helium", "Hydrogen", "Oxygen", "Carbon"],
+                    answer: "Hydrogen"
+                },
+                {
+                    question: "What is the study of plants called?",
+                    options: ["Zoology", "Botany", "Geology", "Biology"],
+                    answer: "Botany"
+                },
+                {
+                    question: "What force keeps us on the ground?",
+                    options: ["Magnetism", "Gravity", "Friction", "Inertia"],
+                    answer: "Gravity"
+                },
+                {
+                    question: "Which country consumes the most chocolate per capita?",
+                    options: ["Switzerland", "Belgium", "Germany", "United States"],
+                    answer: "Switzerland"
+                }
+            ],
+            science: [
+                // 50 science questions
+                {
+                    question: "What is the chemical symbol for water?",
+                    options: ["Wa", "H2O", "Wt", "O2"],
+                    answer: "H2O"
+                },
+                {
+                    question: "Which planet is closest to the Sun?",
+                    options: ["Venus", "Mercury", "Earth", "Mars"],
+                    answer: "Mercury"
+                },
+                {
+                    question: "What is the main gas that makes up the Earth's atmosphere?",
+                    options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+                    answer: "Nitrogen"
+                },
+                {
+                    question: "What is the largest organ in the human body?",
+                    options: ["Liver", "Brain", "Skin", "Heart"],
+                    answer: "Skin"
+                },
+                {
+                    question: "Which scientist proposed the theory of relativity?",
+                    options: ["Isaac Newton", "Albert Einstein", "Galileo Galilei", "Stephen Hawking"],
+                    answer: "Albert Einstein"
+                },
+                {
+                    question: "What is the boiling point of water in Celsius?",
+                    options: ["90°", "100°", "110°", "120°"],
+                    answer: "100°"
+                },
+                {
+                    question: "Which element has the atomic number 1?",
+                    options: ["Helium", "Hydrogen", "Oxygen", "Carbon"],
+                    answer: "Hydrogen"
+                },
+                {
+                    question: "What is the study of plants called?",
+                    options: ["Zoology", "Botany", "Geology", "Biology"],
+                    answer: "Botany"
+                },
+                {
+                    question: "What force keeps us on the ground?",
+                    options: ["Magnetism", "Gravity", "Friction", "Inertia"],
+                    answer: "Gravity"
+                },
+                {
+                    question: "What is the hardest natural substance on Earth?",
+                    options: ["Gold", "Iron", "Diamond", "Quartz"],
+                    answer: "Diamond"
+                },
+                {
+                    question: "What is the chemical symbol for sodium?",
+                    options: ["So", "Sd", "Na", "No"],
+                    answer: "Na"
+                },
+                {
+                    question: "Which gas is most abundant in Earth's atmosphere?",
+                    options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Argon"],
+                    answer: "Nitrogen"
+                },
+                {
+                    question: "What is the pH value of pure water?",
+                    options: ["5", "7", "9", "11"],
+                    answer: "7"
+                },
+                {
+                    question: "Which planet is known as the 'Morning Star'?",
+                    options: ["Mars", "Venus", "Jupiter", "Saturn"],
+                    answer: "Venus"
+                },
+                {
+                    question: "What is the unit of electrical resistance?",
+                    options: ["Volt", "Ampere", "Ohm", "Watt"],
+                    answer: "Ohm"
+                },
+                {
+                    question: "Which element is essential for human bones and teeth?",
+                    options: ["Iron", "Calcium", "Sodium", "Potassium"],
+                    answer: "Calcium"
+                },
+                {
+                    question: "What is the study of fossils called?",
+                    options: ["Paleontology", "Archaeology", "Geology", "Meteorology"],
+                    answer: "Paleontology"
+                },
+                {
+                    question: "Which gas do plants release during photosynthesis?",
+                    options: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"],
+                    answer: "Oxygen"
+                },
+                {
+                    question: "What is the fastest animal on land?",
+                    options: ["Lion", "Cheetah", "Greyhound", "Pronghorn Antelope"],
+                    answer: "Cheetah"
+                },
+                {
+                    question: "Which part of the plant conducts photosynthesis?",
+                    options: ["Root", "Stem", "Leaf", "Flower"],
+                    answer: "Leaf"
+                },
+                {
+                    question: "What is the largest planet in our solar system?",
+                    options: ["Earth", "Saturn", "Jupiter", "Neptune"],
+                    answer: "Jupiter"
+                },
+                {
+                    question: "Which scientist discovered penicillin?",
+                    options: ["Marie Curie", "Alexander Fleming", "Louis Pasteur", "Robert Koch"],
+                    answer: "Alexander Fleming"
+                },
+                {
+                    question: "What is the speed of light in a vacuum?",
+                    options: ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"],
+                    answer: "300,000 km/s"
+                },
+                {
+                    question: "Which blood cells are responsible for carrying oxygen?",
+                    options: ["White blood cells", "Red blood cells", "Platelets", "Plasma"],
+                    answer: "Red blood cells"
+                },
+                {
+                    question: "What is the chemical symbol for silver?",
+                    options: ["Si", "Sv", "Ag", "Au"],
+                    answer: "Ag"
+                },
+                {
+                    question: "Which vitamin is produced when the human body is exposed to sunlight?",
+                    options: ["Vitamin A", "Vitamin B12", "Vitamin C", "Vitamin D"],
+                    answer: "Vitamin D"
+                },
+                {
+                    question: "What is the largest type of shark?",
+                    options: ["Great White", "Hammerhead", "Whale Shark", "Tiger Shark"],
+                    answer: "Whale Shark"
+                },
+                {
+                    question: "Which metal is liquid at room temperature?",
+                    options: ["Mercury", "Gold", "Silver", "Copper"],
+                    answer: "Mercury"
+                },
+                {
+                    question: "What is the study of earthquakes called?",
+                    options: ["Volcanology", "Seismology", "Meteorology", "Geology"],
+                    answer: "Seismology"
+                },
+                {
+                    question: "Which planet has the most moons?",
+                    options: ["Jupiter", "Saturn", "Uranus", "Neptune"],
+                    answer: "Saturn"
+                },
+                {
+                    question: "What is the smallest unit of life?",
+                    options: ["Atom", "Cell", "Molecule", "Organ"],
+                    answer: "Cell"
+                },
+                {
+                    question: "Which gas gives plants their green color?",
+                    options: ["Chlorine", "Chlorophyll", "Carbon Dioxide", "Oxygen"],
+                    answer: "Chlorophyll"
+                },
+                {
+                    question: "What is the hardest mineral on the Mohs scale?",
+                    options: ["Topaz", "Quartz", "Diamond", "Corundum"],
+                    answer: "Diamond"
+                },
+                {
+                    question: "Which scientist formulated the laws of motion?",
+                    options: ["Albert Einstein", "Galileo Galilei", "Isaac Newton", "Nikola Tesla"],
+                    answer: "Isaac Newton"
+                },
+                {
+                    question: "What is the chemical symbol for potassium?",
+                    options: ["Po", "Pt", "K", "Ka"],
+                    answer: "K"
+                },
+                {
+                    question: "Which part of the brain controls balance?",
+                    options: ["Cerebrum", "Cerebellum", "Brain Stem", "Hypothalamus"],
+                    answer: "Cerebellum"
+                },
+                {
+                    question: "What is the most abundant element in the universe?",
+                    options: ["Oxygen", "Carbon", "Hydrogen", "Helium"],
+                    answer: "Hydrogen"
+                },
+                {
+                    question: "Which organ produces insulin in the human body?",
+                    options: ["Liver", "Pancreas", "Kidney", "Stomach"],
+                    answer: "Pancreas"
+                },
+                {
+                    question: "What is the chemical symbol for iron?",
+                    options: ["Ir", "In", "Fe", "Fi"],
+                    answer: "Fe"
+                },
+                {
+                    question: "Which planet is known as the 'Red Planet'?",
+                    options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                    answer: "Mars"
+                },
+                {
+                    question: "What is the study of the weather called?",
+                    options: ["Geology", "Meteorology", "Oceanography", "Climatology"],
+                    answer: "Meteorology"
+                },
+                {
+                    question: "Which gas is used by plants during photosynthesis?",
+                    options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+                    answer: "Carbon Dioxide"
+                },
+                {
+                    question: "What is the largest bone in the human body?",
+                    options: ["Skull", "Femur", "Tibia", "Humerus"],
+                    answer: "Femur"
+                },
+                {
+                    question: "Which element is the main component of diamonds?",
+                    options: ["Silicon", "Carbon", "Oxygen", "Calcium"],
+                    answer: "Carbon"
+                },
+                {
+                    question: "What is the chemical symbol for lead?",
+                    options: ["Le", "Ld", "Pb", "Pl"],
+                    answer: "Pb"
+                },
+                {
+                    question: "Which planet has the Great Red Spot?",
+                    options: ["Mars", "Jupiter", "Saturn", "Neptune"],
+                    answer: "Jupiter"
+                },
+                {
+                    question: "What is the study of birds called?",
+                    options: ["Entomology", "Ornithology", "Herpetology", "Ichthyology"],
+                    answer: "Ornithology"
+                },
+                {
+                    question: "Which gas is known as laughing gas?",
+                    options: ["Oxygen", "Carbon Dioxide", "Nitrous Oxide", "Helium"],
+                    answer: "Nitrous Oxide"
+                },
+                {
+                    question: "What is the chemical symbol for copper?",
+                    options: ["Co", "Cp", "Cu", "Cr"],
+                    answer: "Cu"
+                },
+                {
+                    question: "Which planet has the most extensive ring system?",
+                    options: ["Jupiter", "Saturn", "Uranus", "Neptune"],
+                    answer: "Saturn"
+                },
+                {
+                    question: "What is the study of fungi called?",
+                    options: ["Mycology", "Botany", "Zoology", "Entomology"],
+                    answer: "Mycology"
+                },
+                {
+                    question: "Which vitamin is also known as ascorbic acid?",
+                    options: ["Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"],
+                    answer: "Vitamin C"
+                },
+                {
+                    question: "What is the chemical symbol for tin?",
+                    options: ["Ti", "Tn", "Sn", "Si"],
+                    answer: "Sn"
+                },
+                {
+                    question: "Which planet is the hottest in our solar system?",
+                    options: ["Mercury", "Venus", "Earth", "Mars"],
+                    answer: "Venus"
+                },
+                {
+                    question: "What is the study of the nervous system called?",
+                    options: ["Cardiology", "Neurology", "Hematology", "Endocrinology"],
+                    answer: "Neurology"
+                }
+            ],
+            history: [
+                // 50 history questions
+                {
+                    question: "Who was the first President of the United States?",
+                    options: ["Thomas Jefferson", "George Washington", "Abraham Lincoln", "John Adams"],
+                    answer: "George Washington"
+                },
+                {
+                    question: "In which year did World War II end?",
+                    options: ["1943", "1945", "1947", "1950"],
+                    answer: "1945"
+                },
+                {
+                    question: "Which ancient civilization built the pyramids?",
+                    options: ["Greeks", "Romans", "Egyptians", "Mayans"],
+                    answer: "Egyptians"
+                },
+                {
+                    question: "Who painted the Mona Lisa?",
+                    options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
+                    answer: "Leonardo da Vinci"
+                },
+                {
+                    question: "Which country was the first to send a human to space?",
+                    options: ["USA", "China", "Russia", "Germany"],
+                    answer: "Russia"
+                },
+                {
+                    question: "When was the Declaration of Independence signed?",
+                    options: ["1776", "1789", "1801", "1812"],
+                    answer: "1776"
+                },
+                {
+                    question: "Who was known as the 'Iron Lady'?",
+                    options: ["Angela Merkel", "Margaret Thatcher", "Indira Gandhi", "Golda Meir"],
+                    answer: "Margaret Thatcher"
+                },
+                {
+                    question: "Which empire was ruled by Julius Caesar?",
+                    options: ["Greek", "Roman", "Persian", "Ottoman"],
+                    answer: "Roman"
+                },
+                {
+                    question: "In which year did the Titanic sink?",
+                    options: ["1905", "1912", "1918", "1923"],
+                    answer: "1912"
+                },
+                {
+                    question: "Who discovered America?",
+                    options: ["Christopher Columbus", "Vasco da Gama", "Ferdinand Magellan", "James Cook"],
+                    answer: "Christopher Columbus"
+                },
+                {
+                    question: "Which war was fought between the North and South in the United States?",
+                    options: ["Revolutionary War", "Civil War", "World War I", "World War II"],
+                    answer: "Civil War"
+                },
+                {
+                    question: "Who wrote the 'I Have a Dream' speech?",
+                    options: ["Malcolm X", "Martin Luther King Jr.", "Nelson Mandela", "Barack Obama"],
+                    answer: "Martin Luther King Jr."
+                },
+                {
+                    question: "Which ancient wonder was located in Babylon?",
+                    options: ["Great Pyramid", "Hanging Gardens", "Colossus of Rhodes", "Lighthouse of Alexandria"],
+                    answer: "Hanging Gardens"
+                },
+                {
+                    question: "Who was the first woman to fly solo across the Atlantic?",
+                    options: ["Amelia Earhart", "Bessie Coleman", "Harriet Quimby", "Jacqueline Cochran"],
+                    answer: "Amelia Earhart"
+                },
+                {
+                    question: "Which civilization built Machu Picchu?",
+                    options: ["Aztec", "Maya", "Inca", "Olmec"],
+                    answer: "Inca"
+                },
+                {
+                    question: "Who was the first emperor of Rome?",
+                    options: ["Julius Caesar", "Augustus", "Nero", "Caligula"],
+                    answer: "Augustus"
+                },
+                {
+                    question: "Which country was not part of the Axis powers in WWII?",
+                    options: ["Germany", "Italy", "Japan", "Russia"],
+                    answer: "Russia"
+                },
+                {
+                    question: "Who invented the telephone?",
+                    options: ["Thomas Edison", "Alexander Graham Bell", "Nikola Tesla", "Guglielmo Marconi"],
+                    answer: "Alexander Graham Bell"
+                },
+                {
+                    question: "Which year did the Berlin Wall fall?",
+                    options: ["1985", "1989", "1991", "1993"],
+                    answer: "1989"
+                },
+                {
+                    question: "Who was the first female Prime Minister of the UK?",
+                    options: ["Theresa May", "Margaret Thatcher", "Indira Gandhi", "Angela Merkel"],
+                    answer: "Margaret Thatcher"
+                },
+                {
+                    question: "Which ancient Greek philosopher was the teacher of Alexander the Great?",
+                    options: ["Socrates", "Plato", "Aristotle", "Pythagoras"],
+                    answer: "Aristotle"
+                },
+                {
+                    question: "In which year did the French Revolution begin?",
+                    options: ["1776", "1789", "1799", "1812"],
+                    answer: "1789"
+                },
+                {
+                    question: "Who was the first person to step on the moon?",
+                    options: ["Neil Armstrong", "Buzz Aldrin", "Yuri Gagarin", "John Glenn"],
+                    answer: "Neil Armstrong"
+                },
+                {
+                    question: "Which empire was ruled by Genghis Khan?",
+                    options: ["Ottoman", "Mongol", "Persian", "Roman"],
+                    answer: "Mongol"
+                },
+                {
+                    question: "Who painted the ceiling of the Sistine Chapel?",
+                    options: ["Leonardo da Vinci", "Michelangelo", "Raphael", "Donatello"],
+                    answer: "Michelangelo"
+                },
+                {
+                    question: "Which country was the first to give women the right to vote?",
+                    options: ["United States", "United Kingdom", "New Zealand", "France"],
+                    answer: "New Zealand"
+                },
+                {
+                    question: "Who was the first African American president of the United States?",
+                    options: ["Jesse Jackson", "Barack Obama", "Colin Powell", "Kamala Harris"],
+                    answer: "Barack Obama"
+                },
+                {
+                    question: "Which ancient civilization developed the concept of zero?",
+                    options: ["Egyptians", "Greeks", "Mayans", "Indians"],
+                    answer: "Indians"
+                },
+                {
+                    question: "Who was the first female astronaut?",
+                    options: ["Sally Ride", "Valentina Tereshkova", "Mae Jemison", "Eileen Collins"],
+                    answer: "Valentina Tereshkova"
+                },
+                {
+                    question: "Which war was fought between Athens and Sparta?",
+                    options: ["Trojan War", "Peloponnesian War", "Punic War", "Persian War"],
+                    answer: "Peloponnesian War"
+                },
+                {
+                    question: "Who wrote 'The Communist Manifesto'?",
+                    options: ["Vladimir Lenin", "Karl Marx", "Joseph Stalin", "Friedrich Engels"],
+                    answer: "Karl Marx"
+                },
+                {
+                    question: "Which ancient city was destroyed by the eruption of Mount Vesuvius?",
+                    options: ["Athens", "Rome", "Pompeii", "Sparta"],
+                    answer: "Pompeii"
+                },
+                {
+                    question: "Who was the first European to reach India by sea?",
+                    options: ["Christopher Columbus", "Vasco da Gama", "Ferdinand Magellan", "Marco Polo"],
+                    answer: "Vasco da Gama"
+                },
+                {
+                    question: "Which Chinese dynasty built the Great Wall?",
+                    options: ["Shang", "Zhou", "Qin", "Han"],
+                    answer: "Qin"
+                },
+                {
+                    question: "Who was the last Tsar of Russia?",
+                    options: ["Peter the Great", "Nicholas II", "Alexander II", "Ivan the Terrible"],
+                    answer: "Nicholas II"
+                },
+                {
+                    question: "Which ancient civilization built Stonehenge?",
+                    options: ["Celts", "Druids", "Neolithic Britons", "Romans"],
+                    answer: "Neolithic Britons"
+                },
+                {
+                    question: "Who was the first female pharaoh of Egypt?",
+                    options: ["Nefertiti", "Cleopatra", "Hatshepsut", "Nefertari"],
+                    answer: "Hatshepsut"
+                },
+                {
+                    question: "Which war was known as the 'War to End All Wars'?",
+                    options: ["World War I", "World War II", "Vietnam War", "Korean War"],
+                    answer: "World War I"
+                },
+                {
+                    question: "Who discovered the tomb of Tutankhamun?",
+                    options: ["Howard Carter", "Flinders Petrie", "Jean-François Champollion", "Zahi Hawass"],
+                    answer: "Howard Carter"
+                },
+                {
+                    question: "Which ancient civilization invented paper?",
+                    options: ["Egyptians", "Greeks", "Chinese", "Romans"],
+                    answer: "Chinese"
+                },
+                {
+                    question: "Who was the first ruler of the Mongol Empire?",
+                    options: ["Kublai Khan", "Genghis Khan", "Attila the Hun", "Tamerlane"],
+                    answer: "Genghis Khan"
+                },
+                {
+                    question: "Which country was the first to industrialize?",
+                    options: ["United States", "France", "Germany", "United Kingdom"],
+                    answer: "United Kingdom"
+                },
+                {
+                    question: "Who was the first female Nobel Prize winner?",
+                    options: ["Marie Curie", "Mother Teresa", "Rosalind Franklin", "Jane Addams"],
+                    answer: "Marie Curie"
+                },
+                {
+                    question: "Which ancient civilization built the city of Carthage?",
+                    options: ["Greeks", "Phoenicians", "Romans", "Egyptians"],
+                    answer: "Phoenicians"
+                },
+                {
+                    question: "Who was the first European to reach North America?",
+                    options: ["Christopher Columbus", "Leif Erikson", "John Cabot", "Amerigo Vespucci"],
+                    answer: "Leif Erikson"
+                },
+                {
+                    question: "Which empire was ruled by Suleiman the Magnificent?",
+                    options: ["Ottoman", "Mughal", "Persian", "Byzantine"],
+                    answer: "Ottoman"
+                },
+                {
+                    question: "Who was the first female Supreme Court Justice in the US?",
+                    options: ["Ruth Bader Ginsburg", "Sandra Day O'Connor", "Sonia Sotomayor", "Elena Kagan"],
+                    answer: "Sandra Day O'Connor"
+                },
+                {
+                    question: "Which ancient civilization developed the first writing system?",
+                    options: ["Egyptians", "Sumerians", "Chinese", "Indus Valley"],
+                    answer: "Sumerians"
+                },
+                {
+                    question: "Who was the first female pilot to fly solo across the Atlantic?",
+                    options: ["Amelia Earhart", "Bessie Coleman", "Harriet Quimby", "Jacqueline Cochran"],
+                    answer: "Amelia Earhart"
+                },
+                {
+                    question: "Which ancient city was the capital of the Aztec Empire?",
+                    options: ["Cuzco", "Machu Picchu", "Tenochtitlan", "Teotihuacan"],
+                    answer: "Tenochtitlan"
+                },
+                {
+                    question: "Who was the first female doctor in the United States?",
+                    options: ["Elizabeth Blackwell", "Florence Nightingale", "Clara Barton", "Mary Edwards Walker"],
+                    answer: "Elizabeth Blackwell"
+                },
+                {
+                    question: "Which ancient civilization built the Angkor Wat temple complex?",
+                    options: ["Khmer", "Thai", "Vietnamese", "Burmese"],
+                    answer: "Khmer"
+                },
+                {
+                    question: "Who was the first female astronaut to walk in space?",
+                    options: ["Sally Ride", "Valentina Tereshkova", "Kathryn Sullivan", "Mae Jemison"],
+                    answer: "Kathryn Sullivan"
+                }
+            ],
+            geography: [
+                // 50 geography questions
+                {
+                    question: "What is the capital of Australia?",
+                    options: ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+                    answer: "Canberra"
+                },
+                {
+                    question: "Which country has the most natural lakes?",
+                    options: ["Canada", "Russia", "USA", "Finland"],
+                    answer: "Canada"
+                },
+                {
+                    question: "What is the name of the world's largest coral reef system?",
+                    options: ["Great Barrier Reef", "Belize Barrier Reef", "New Caledonia Barrier Reef", "Red Sea Coral Reef"],
+                    answer: "Great Barrier Reef"
+                },
+                {
+                    question: "Which country has the longest coastline?",
+                    options: ["Russia", "Canada", "USA", "Australia"],
+                    answer: "Canada"
+                },
+                {
+                    question: "What is the saltiest sea in the world?",
+                    options: ["Dead Sea", "Red Sea", "Mediterranean Sea", "Caspian Sea"],
+                    answer: "Dead Sea"
+                },
+                {
+                    question: "Which country is the largest producer of coffee?",
+                    options: ["Colombia", "Brazil", "Vietnam", "Ethiopia"],
+                    answer: "Brazil"
+                },
+                {
+                    question: "What is the only continent without reptiles or snakes?",
+                    options: ["Australia", "Antarctica", "Europe", "North America"],
+                    answer: "Antarctica"
+                },
+                {
+                    question: "Which country has the most official languages?",
+                    options: ["India", "South Africa", "Switzerland", "Bolivia"],
+                    answer: "Bolivia"
+                },
+                {
+                    question: "What is the flattest continent?",
+                    options: ["Africa", "Australia", "Antarctica", "Europe"],
+                    answer: "Australia"
+                },
+                {
+                    question: "Which country has the most UNESCO World Heritage Sites?",
+                    options: ["China", "Italy", "Spain", "France"],
+                    answer: "Italy"
+                },
+                {
+                    question: "What is the largest desert in the world?",
+                    options: ["Sahara", "Arabian", "Gobi", "Antarctic"],
+                    answer: "Antarctic"
+                },
+                {
+                    question: "Which river is the longest in the world?",
+                    options: ["Amazon", "Nile", "Yangtze", "Mississippi"],
+                    answer: "Nile"
+                },
+                {
+                    question: "Which country is both an island and a continent?",
+                    options: ["Greenland", "Australia", "Madagascar", "New Zealand"],
+                    answer: "Australia"
+                },
+                {
+                    question: "What is the capital of Canada?",
+                    options: ["Toronto", "Vancouver", "Ottawa", "Montreal"],
+                    answer: "Ottawa"
+                },
+                {
+                    question: "Which mountain range includes Mount Everest?",
+                    options: ["Andes", "Rockies", "Himalayas", "Alps"],
+                    answer: "Himalayas"
+                },
+                {
+                    question: "Which African country was formerly known as Abyssinia?",
+                    options: ["Ethiopia", "Sudan", "Kenya", "Tanzania"],
+                    answer: "Ethiopia"
+                },
+                {
+                    question: "Which U.S. state is the largest by area?",
+                    options: ["Texas", "California", "Alaska", "Montana"],
+                    answer: "Alaska"
+                },
+                {
+                    question: "Which country is home to the kangaroo?",
+                    options: ["New Zealand", "Australia", "South Africa", "Argentina"],
+                    answer: "Australia"
+                },
+                {
+                    question: "What is the capital of Japan?",
+                    options: ["Osaka", "Kyoto", "Tokyo", "Hiroshima"],
+                    answer: "Tokyo"
+                },
+                {
+                    question: "Which sea is the saltiest?",
+                    options: ["Red Sea", "Dead Sea", "Mediterranean Sea", "Caspian Sea"],
+                    answer: "Dead Sea"
+                },
+                {
+                    question: "Which country has the most volcanoes?",
+                    options: ["Indonesia", "Japan", "USA", "Chile"],
+                    answer: "USA"
+                },
+                {
+                    question: "What is the capital of Brazil?",
+                    options: ["Rio de Janeiro", "São Paulo", "Brasília", "Salvador"],
+                    answer: "Brasília"
+                },
+                {
+                    question: "Which African country is known as the 'Pearl of Africa'?",
+                    options: ["Kenya", "Tanzania", "Uganda", "Zambia"],
+                    answer: "Uganda"
+                },
+                {
+                    question: "Which river flows through Paris?",
+                    options: ["Thames", "Seine", "Danube", "Rhine"],
+                    answer: "Seine"
+                },
+                {
+                    question: "Which country is the smallest by land area?",
+                    options: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"],
+                    answer: "Vatican City"
+                },
+                {
+                    question: "Which mountain is the highest in Africa?",
+                    options: ["Mount Kenya", "Mount Kilimanjaro", "Mount Stanley", "Mount Meru"],
+                    answer: "Mount Kilimanjaro"
+                },
+                {
+                    question: "Which country is known as the 'Land of the Rising Sun'?",
+                    options: ["China", "Japan", "South Korea", "Thailand"],
+                    answer: "Japan"
+                },
+                {
+                    question: "Which desert is the largest in the world?",
+                    options: ["Sahara", "Arabian", "Gobi", "Kalahari"],
+                    answer: "Sahara"
+                },
+                {
+                    question: "Which country has the longest river?",
+                    options: ["Brazil", "Egypt", "China", "Russia"],
+                    answer: "Egypt"
+                },
+                {
+                    question: "Which European country has the most islands?",
+                    options: ["Sweden", "Greece", "Norway", "Finland"],
+                    answer: "Sweden"
+                },
+                {
+                    question: "Which country is home to the Amazon Rainforest?",
+                    options: ["Brazil", "Peru", "Colombia", "Venezuela"],
+                    answer: "Brazil"
+                },
+                {
+                    question: "Which U.S. state is known as the 'Sunshine State'?",
+                    options: ["California", "Florida", "Texas", "Arizona"],
+                    answer: "Florida"
+                },
+                {
+                    question: "Which country is both in Europe and Asia?",
+                    options: ["Turkey", "Russia", "Kazakhstan", "Georgia"],
+                    answer: "Turkey"
+                },
+                {
+                    question: "Which African river is the longest?",
+                    options: ["Nile", "Congo", "Niger", "Zambezi"],
+                    answer: "Nile"
+                },
+                {
+                    question: "Which country has the most time zones?",
+                    options: ["USA", "Russia", "France", "China"],
+                    answer: "France"
+                },
+                {
+                    question: "Which mountain range separates Europe from Asia?",
+                    options: ["Alps", "Andes", "Himalayas", "Ural Mountains"],
+                    answer: "Ural Mountains"
+                },
+                {
+                    question: "Which country is known as the 'Land of Fire and Ice'?",
+                    options: ["Norway", "Finland", "Iceland", "Greenland"],
+                    answer: "Iceland"
+                },
+                {
+                    question: "Which U.S. state has the most national parks?",
+                    options: ["California", "Alaska", "Utah", "Colorado"],
+                    answer: "California"
+                },
+                {
+                    question: "Which country is home to the Great Pyramid of Giza?",
+                    options: ["Iraq", "Egypt", "Sudan", "Libya"],
+                    answer: "Egypt"
+                },
+                {
+                    question: "Which European country has the longest coastline?",
+                    options: ["Norway", "Greece", "Italy", "Spain"],
+                    answer: "Norway"
+                },
+                {
+                    question: "Which country is the largest by land area?",
+                    options: ["China", "Canada", "USA", "Russia"],
+                    answer: "Russia"
+                },
+                {
+                    question: "Which African country is completely surrounded by South Africa?",
+                    options: ["Lesotho", "Swaziland", "Botswana", "Namibia"],
+                    answer: "Lesotho"
+                },
+                {
+                    question: "Which river flows through the Grand Canyon?",
+                    options: ["Mississippi", "Colorado", "Rio Grande", "Columbia"],
+                    answer: "Colorado"
+                },
+                {
+                    question: "Which country is known as the 'Emerald Isle'?",
+                    options: ["Scotland", "Ireland", "New Zealand", "Jamaica"],
+                    answer: "Ireland"
+                },
+                {
+                    question: "Which U.S. state is the only one to grow coffee commercially?",
+                    options: ["California", "Florida", "Hawaii", "Texas"],
+                    answer: "Hawaii"
+                },
+                {
+                    question: "Which country has the most freshwater lakes?",
+                    options: ["Canada", "Russia", "USA", "Finland"],
+                    answer: "Canada"
+                },
+                {
+                    question: "Which desert is located in South America?",
+                    options: ["Sahara", "Atacama", "Gobi", "Kalahari"],
+                    answer: "Atacama"
+                },
+                {
+                    question: "Which country is home to Mount Everest?",
+                    options: ["China", "Nepal", "India", "Bhutan"],
+                    answer: "Nepal"
+                },
+                {
+                    question: "Which U.S. state has the most volcanoes?",
+                    options: ["Hawaii", "Alaska", "California", "Washington"],
+                    answer: "Alaska"
+                },
+                {
+                    question: "Which country is known as the 'Land of a Thousand Lakes'?",
+                    options: ["Sweden", "Norway", "Finland", "Canada"],
+                    answer: "Finland"
+                },
+                {
+                    question: "Which river forms part of the border between the USA and Mexico?",
+                    options: ["Mississippi", "Colorado", "Rio Grande", "Arkansas"],
+                    answer: "Rio Grande"
+                },
+                {
+                    question: "Which country is home to the ancient city of Petra?",
+                    options: ["Egypt", "Israel", "Jordan", "Syria"],
+                    answer: "Jordan"
+                },
+                {
+                    question: "Which U.S. state is known as the 'Lone Star State'?",
+                    options: ["California", "Texas", "Florida", "Arizona"],
+                    answer: "Texas"
+                },
+                {
+                    question: "Which country has the most islands in the world?",
+                    options: ["Indonesia", "Philippines", "Sweden", "Canada"],
+                    answer: "Sweden"
+                }
+            ],
+            entertainment: [
+                // 50 entertainment questions
+                {
+                    question: "Who played Jack Dawson in the movie Titanic?",
+                    options: ["Brad Pitt", "Tom Cruise", "Leonardo DiCaprio", "Johnny Depp"],
+                    answer: "Leonardo DiCaprio"
+                },
+                {
+                    question: "Which band sang the song 'Bohemian Rhapsody'?",
+                    options: ["The Beatles", "Queen", "Pink Floyd", "Led Zeppelin"],
+                    answer: "Queen"
+                },
+                {
+                    question: "Who is known as the 'King of Pop'?",
+                    options: ["Elvis Presley", "Michael Jackson", "Prince", "Justin Timberlake"],
+                    answer: "Michael Jackson"
+                },
+                {
+                    question: "Which TV show features the characters Ross, Rachel, and Chandler?",
+                    options: ["How I Met Your Mother", "The Office", "Friends", "Seinfeld"],
+                    answer: "Friends"
+                },
+                {
+                    question: "Who directed the movie 'Jurassic Park'?",
+                    options: ["Steven Spielberg", "James Cameron", "George Lucas", "Ridley Scott"],
+                    answer: "Steven Spielberg"
+                },
+                {
+                    question: "Which actor played Iron Man in the Marvel movies?",
+                    options: ["Chris Evans", "Robert Downey Jr.", "Chris Hemsworth", "Mark Ruffalo"],
+                    answer: "Robert Downey Jr."
+                },
+                {
+                    question: "What is the highest-grossing film of all time?",
+                    options: ["Avatar", "Avengers: Endgame", "Titanic", "Star Wars: The Force Awakens"],
+                    answer: "Avatar"
+                },
+                {
+                    question: "Which artist released the album 'Thriller' in 1982?",
+                    options: ["Prince", "Madonna", "Michael Jackson", "Whitney Houston"],
+                    answer: "Michael Jackson"
+                },
+                {
+                    question: "Which TV show is set in the fictional town of Hawkins?",
+                    options: ["The Walking Dead", "Stranger Things", "Riverdale", "Dark"],
+                    answer: "Stranger Things"
+                },
+                {
+                    question: "Who played the character Harry Potter in the film series?",
+                    options: ["Daniel Radcliffe", "Rupert Grint", "Tom Felton", "Elijah Wood"],
+                    answer: "Daniel Radcliffe"
+                },
+                {
+                    question: "Which singer is known as the 'Material Girl'?",
+                    options: ["Cher", "Madonna", "Britney Spears", "Lady Gaga"],
+                    answer: "Madonna"
+                },
+                {
+                    question: "Which movie won the first Academy Award for Best Picture?",
+                    options: ["Gone with the Wind", "Wings", "Casablanca", "The Jazz Singer"],
+                    answer: "Wings"
+                },
+                {
+                    question: "Who created the cartoon characters Tom and Jerry?",
+                    options: ["Walt Disney", "William Hanna and Joseph Barbera", "Chuck Jones", "Tex Avery"],
+                    answer: "William Hanna and Joseph Barbera"
+                },
+                {
+                    question: "Which actor played James Bond in 'GoldenEye'?",
+                    options: ["Sean Connery", "Roger Moore", "Pierce Brosnan", "Daniel Craig"],
+                    answer: "Pierce Brosnan"
+                },
+                {
+                    question: "Which TV show features the character Sheldon Cooper?",
+                    options: ["Friends", "The Office", "The Big Bang Theory", "How I Met Your Mother"],
+                    answer: "The Big Bang Theory"
+                },
+                {
+                    question: "Who voiced the character of Woody in 'Toy Story'?",
+                    options: ["Tom Hanks", "Tim Allen", "Billy Crystal", "John Goodman"],
+                    answer: "Tom Hanks"
+                },
+                {
+                    question: "Which artist painted 'The Starry Night'?",
+                    options: ["Pablo Picasso", "Vincent van Gogh", "Claude Monet", "Salvador Dalí"],
+                    answer: "Vincent van Gogh"
+                },
+                {
+                    question: "Which musical features the song 'Memory'?",
+                    options: ["Cats", "Les Misérables", "The Phantom of the Opera", "Chicago"],
+                    answer: "Cats"
+                },
+                {
+                    question: "Who played the Joker in 'The Dark Knight'?",
+                    options: ["Jack Nicholson", "Heath Ledger", "Jared Leto", "Joaquin Phoenix"],
+                    answer: "Heath Ledger"
+                },
+                {
+                    question: "Which TV show features the character Walter White?",
+                    options: ["Breaking Bad", "The Sopranos", "The Wire", "Better Call Saul"],
+                    answer: "Breaking Bad"
+                },
+                {
+                    question: "Who directed the movie 'Pulp Fiction'?",
+                    options: ["Martin Scorsese", "Quentin Tarantino", "Steven Spielberg", "David Fincher"],
+                    answer: "Quentin Tarantino"
+                },
+                {
+                    question: "Which singer is known as the 'Queen of Soul'?",
+                    options: ["Aretha Franklin", "Diana Ross", "Whitney Houston", "Tina Turner"],
+                    answer: "Aretha Franklin"
+                },
+                {
+                    question: "Which movie features the quote 'May the Force be with you'?",
+                    options: ["Star Trek", "Star Wars", "The Matrix", "Guardians of the Galaxy"],
+                    answer: "Star Wars"
+                },
+                {
+                    question: "Who played the character Tony Stark in the Marvel movies?",
+                    options: ["Chris Evans", "Robert Downey Jr.", "Chris Hemsworth", "Mark Ruffalo"],
+                    answer: "Robert Downey Jr."
+                },
+                {
+                    question: "Which TV show is about a high school chemistry teacher turned meth producer?",
+                    options: ["The Sopranos", "Breaking Bad", "The Wire", "Better Call Saul"],
+                    answer: "Breaking Bad"
+                },
+                {
+                    question: "Who sang the theme song for the James Bond movie 'Goldfinger'?",
+                    options: ["Shirley Bassey", "Adele", "Nancy Sinatra", "Paul McCartney"],
+                    answer: "Shirley Bassey"
+                },
+                {
+                    question: "Which movie features the character Forrest Gump?",
+                    options: ["The Shawshank Redemption", "Forrest Gump", "The Green Mile", "Saving Private Ryan"],
+                    answer: "Forrest Gump"
+                },
+                {
+                    question: "Who played the character Katniss Everdeen in 'The Hunger Games'?",
+                    options: ["Emma Watson", "Jennifer Lawrence", "Kristen Stewart", "Shailene Woodley"],
+                    answer: "Jennifer Lawrence"
+                },
+                {
+                    question: "Which band performed at Woodstock in 1969?",
+                    options: ["The Beatles", "The Rolling Stones", "Jimi Hendrix Experience", "Led Zeppelin"],
+                    answer: "Jimi Hendrix Experience"
+                },
+                {
+                    question: "Who directed the movie 'The Shawshank Redemption'?",
+                    options: ["Steven Spielberg", "Frank Darabont", "Martin Scorsese", "Quentin Tarantino"],
+                    answer: "Frank Darabont"
+                },
+                {
+                    question: "Which TV show features the character Don Draper?",
+                    options: ["Breaking Bad", "Mad Men", "The Sopranos", "Boardwalk Empire"],
+                    answer: "Mad Men"
+                },
+                {
+                    question: "Who played the character Jack Sparrow in 'Pirates of the Caribbean'?",
+                    options: ["Johnny Depp", "Orlando Bloom", "Geoffrey Rush", "Javier Bardem"],
+                    answer: "Johnny Depp"
+                },
+                {
+                    question: "Which movie features the character Hannibal Lecter?",
+                    options: ["Se7en", "The Silence of the Lambs", "Zodiac", "American Psycho"],
+                    answer: "The Silence of the Lambs"
+                },
+                {
+                    question: "Who sang the song 'Like a Virgin'?",
+                    options: ["Cher", "Madonna", "Cyndi Lauper", "Whitney Houston"],
+                    answer: "Madonna"
+                },
+                {
+                    question: "Which TV show features the character Carrie Bradshaw?",
+                    options: ["Friends", "Sex and the City", "Gossip Girl", "Desperate Housewives"],
+                    answer: "Sex and the City"
+                },
+                {
+                    question: "Who directed the movie 'Inception'?",
+                    options: ["Christopher Nolan", "Steven Spielberg", "Quentin Tarantino", "David Fincher"],
+                    answer: "Christopher Nolan"
+                },
+                {
+                    question: "Which actor played the character Neo in 'The Matrix'?",
+                    options: ["Keanu Reeves", "Brad Pitt", "Tom Cruise", "Matt Damon"],
+                    answer: "Keanu Reeves"
+                },
+                {
+                    question: "Which movie features the character Darth Vader?",
+                    options: ["Star Trek", "Star Wars", "The Matrix", "Guardians of the Galaxy"],
+                    answer: "Star Wars"
+                },
+                {
+                    question: "Who played the character Hermione Granger in the Harry Potter movies?",
+                    options: ["Emma Watson", "Emma Stone", "Keira Knightley", "Natalie Portman"],
+                    answer: "Emma Watson"
+                },
+                {
+                    question: "Which TV show features the character Homer Simpson?",
+                    options: ["Family Guy", "The Simpsons", "South Park", "American Dad"],
+                    answer: "The Simpsons"
+                },
+                {
+                    question: "Who directed the movie 'The Godfather'?",
+                    options: ["Martin Scorsese", "Francis Ford Coppola", "Quentin Tarantino", "Steven Spielberg"],
+                    answer: "Francis Ford Coppola"
+                },
+                {
+                    question: "Which singer is known as the 'King of Rock and Roll'?",
+                    options: ["Elvis Presley", "Chuck Berry", "Little Richard", "Buddy Holly"],
+                    answer: "Elvis Presley"
+                },
+                {
+                    question: "Which movie features the character Indiana Jones?",
+                    options: ["Jurassic Park", "Indiana Jones", "Star Wars", "Back to the Future"],
+                    answer: "Indiana Jones"
+                },
+                {
+                    question: "Who played the character Tony Soprano in 'The Sopranos'?",
+                    options: ["James Gandolfini", "Robert De Niro", "Al Pacino", "Joe Pesci"],
+                    answer: "James Gandolfini"
+                },
+                {
+                    question: "Which TV show features the character Michael Scott?",
+                    options: ["Parks and Recreation", "The Office", "Brooklyn Nine-Nine", "30 Rock"],
+                    answer: "The Office"
+                },
+                {
+                    question: "Who sang the song 'Rolling in the Deep'?",
+                    options: ["Adele", "Taylor Swift", "Beyoncé", "Rihanna"],
+                    answer: "Adele"
+                },
+                {
+                    question: "Which movie features the character Rocky Balboa?",
+                    options: ["Raging Bull", "Rocky", "The Fighter", "Million Dollar Baby"],
+                    answer: "Rocky"
+                },
+                {
+                    question: "Who played the character The Joker in 'Joker' (2019)?",
+                    options: ["Heath Ledger", "Joaquin Phoenix", "Jared Leto", "Jack Nicholson"],
+                    answer: "Joaquin Phoenix"
+                },
+                {
+                    question: "Which TV show features the character Eleven?",
+                    options: ["The Walking Dead", "Stranger Things", "Dark", "The OA"],
+                    answer: "Stranger Things"
+                },
+                {
+                    question: "Who directed the movie 'Avatar'?",
+                    options: ["Steven Spielberg", "James Cameron", "Peter Jackson", "Christopher Nolan"],
+                    answer: "James Cameron"
+                },
+                {
+                    question: "Which singer is known as the 'Queen of Pop'?",
+                    options: ["Madonna", "Britney Spears", "Lady Gaga", "Beyoncé"],
+                    answer: "Madonna"
+                },
+                {
+                    question: "Which movie features the character Maximus in 'Gladiator'?",
+                    options: ["Russell Crowe", "Brad Pitt", "Tom Cruise", "Matt Damon"],
+                    answer: "Russell Crowe"
+                },
+                {
+                    question: "Who played the character Captain Jack Sparrow in 'Pirates of the Caribbean'?",
+                    options: ["Johnny Depp", "Orlando Bloom", "Geoffrey Rush", "Javier Bardem"],
+                    answer: "Johnny Depp"
+                },
+                {
+                    question: "Which TV show features the character Dexter Morgan?",
+                    options: ["Breaking Bad", "Dexter", "Hannibal", "The Following"],
+                    answer: "Dexter"
+                },
+                {
+                    question: "Who sang the song 'Hello'?",
+                    options: ["Adele", "Taylor Swift", "Beyoncé", "Rihanna"],
+                    answer: "Adele"
+                },
+                {
+                    question: "Which movie features the character Andy Dufresne in 'The Shawshank Redemption'?",
+                    options: ["Tom Hanks", "Morgan Freeman", "Tim Robbins", "Kevin Spacey"],
+                    answer: "Tim Robbins"
+                },
+                {
+                    question: "Who played the character Wolverine in the X-Men movies?",
+                    options: ["Ryan Reynolds", "Hugh Jackman", "Chris Evans", "Robert Downey Jr."],
+                    answer: "Hugh Jackman"
+                },
+                {
+                    question: "Which TV show features the character Tyrion Lannister?",
+                    options: ["The Crown", "Game of Thrones", "The Witcher", "Vikings"],
+                    answer: "Game of Thrones"
+                }
+            ]
+        };
+
+        // Event listeners
+        document.querySelectorAll('#categorySelect .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('#categorySelect .btn').forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline');
+                });
+                this.classList.remove('btn-outline');
+                this.classList.add('btn-primary');
+                selectedCategory = this.dataset.category;
+            });
+        });
+
+        document.querySelectorAll('#questionCountSelect .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('#questionCountSelect .btn').forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline');
+                });
+                this.classList.remove('btn-outline');
+                this.classList.add('btn-primary');
+                questionCount = parseInt(this.dataset.count);
+            });
+        });
+
+        startGameBtn.addEventListener('click', startGame);
+        nextBtn.addEventListener('click', nextQuestion);
+        backBtn.addEventListener('click', previousQuestion);
+        skipBtn.addEventListener('click', skipQuestion);
+        restartBtn.addEventListener('click', restartGame);
+
+        // Initialize with default selections
+        document.querySelector('#categorySelect .btn[data-category="general"]').click();
+        document.querySelector('#questionCountSelect .btn[data-count="10"]').click();
+
+        // Function to start the game
+        function startGame() {
+            if (!selectedCategory) {
+                alert("Please select a category");
+                return;
+            }
+            
+            // Reset user answers
+            userAnswers = [];
+            
+            // Shuffle questions and select the requested number
+            questions = shuffleArray([...questionDatabase[selectedCategory]]);
+            
+            // Ensure we don't request more questions than available
+            if (questionCount > questions.length) {
+                questionCount = questions.length;
+            }
+            
+            questions = questions.slice(0, questionCount);
+            
+            setupScreen.style.display = 'none';
+            questionContainer.style.display = 'block';
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            showQuestion();
+            startTimer();
+        }
+
+        // Function to display current question
+        function showQuestion() {
+            answered = false;
+            resetTimer();
+            
+            const currentQuestion = questions[currentQuestionIndex];
+            progress.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            questionElement.textContent = currentQuestion.question;
+            
+            // Set category label
+            questionCategoryElement.textContent = categoryStyles[selectedCategory].name;
+            questionCategoryElement.style.backgroundColor = categoryStyles[selectedCategory].color;
+            
+            // Clear previous options
+            optionsElement.innerHTML = '';
+            
+            // Create option buttons
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('option-btn');
+                
+                // Add option letter (A, B, C, D)
+                const optionIcon = document.createElement('div');
+                optionIcon.classList.add('option-icon');
+                optionIcon.textContent = String.fromCharCode(65 + index); // A, B, C, D
+                button.appendChild(optionIcon);
+                
+                // Add option text
+                const optionText = document.createElement('span');
+                optionText.textContent = option;
+                button.appendChild(optionText);
+                
+                button.addEventListener('click', () => selectAnswer(button, option));
+                optionsElement.appendChild(button);
+            });
+            
+            // Update navigation buttons
+            backBtn.style.display = currentQuestionIndex > 0 ? 'block' : 'none';
+            skipBtn.style.display = 'block';
+            nextBtn.style.display = 'none';
+        }
+
+        // Function to handle answer selection
+        function selectAnswer(button, selectedOption) {
+            if (answered) return;
+            answered = true;
+            
+            clearInterval(timer);
+            
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            // Disable all options
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.add('disabled');
+                
+                // Get the text content of the button (without the A/B/C/D prefix)
+                const optionText = btn.querySelector('span').textContent;
+                
+                // Highlight correct answer
+                if (optionText === currentQuestion.answer) {
+                    btn.classList.add('correct');
+                }
+                
+                // Highlight wrong answer if selected
+                if (btn === button && optionText !== currentQuestion.answer) {
+                    btn.classList.add('wrong');
+                }
+            });
+            
+            // Store user's answer
+            const isCorrect = selectedOption === currentQuestion.answer;
+            userAnswers.push({
+                question: currentQuestion.question,
+                userAnswer: selectedOption,
+                correctAnswer: currentQuestion.answer,
+                isCorrect: isCorrect,
+                category: selectedCategory
+            });
+            
+            // Update score if correct
+            if (isCorrect) {
+                score++;
+                
+                // Add visual feedback for correct answer
+                button.classList.add('pulse');
+                
+                // Create confetti effect for correct answer
+                if (currentQuestionIndex > questions.length * 0.7) { // Only in later questions
+                    createConfetti();
+                }
+            }
+            
+            // Show next button and hide skip
+            nextBtn.style.display = 'block';
+            skipBtn.style.display = 'none';
+        }
+
+        // Function to move to next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+                startTimer();
+                nextBtn.style.display = 'none';
+            } else {
+                endGame();
+            }
+        }
+
+        // Function to go back to previous question
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+                startTimer();
+                nextBtn.style.display = 'none';
+                
+                // Remove the previous answer from tracking
+                if (userAnswers.length > currentQuestionIndex) {
+                    userAnswers.pop();
+                    score = userAnswers.filter(answer => answer.isCorrect).length;
+                }
+            }
+        }
+
+        // Function to skip current question
+        function skipQuestion() {
+            // Record as unanswered
+            const currentQuestion = questions[currentQuestionIndex];
+            userAnswers.push({
+                question: currentQuestion.question,
+                userAnswer: null,
+                correctAnswer: currentQuestion.answer,
+                isCorrect: false,
+                category: selectedCategory
+            });
+            
+            nextQuestion();
+        }
+
+        // Function to end the game and show results
+        function endGame() {
+            questionContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            
+            finalScoreElement.textContent = `${score} / ${questions.length}`;
+            
+            // Performance comment
+            const percentage = (score / questions.length) * 100;
+            let comment = '';
+            
+            if (percentage >= 90) {
+                comment = "Trivia Master! You're incredibly knowledgeable! 🎉";
+                createConfetti(50);
+            } else if (percentage >= 70) {
+                comment = "Great job! You know your stuff! 👍";
+                createConfetti(30);
+            } else if (percentage >= 50) {
+                comment = "Not bad! You've got some knowledge to build on. 💪";
+            } else {
+                comment = "Keep learning! You'll do better next time! 📚";
+            }
+            
+            performanceCommentElement.textContent = comment;
+            
+            // Show answers summary
+            showAnswersSummary();
+        }
+
+        // Function to show summary of all answers
+        function showAnswersSummary() {
+            answersSummaryElement.innerHTML = '<h3><i class="fas fa-clipboard-list"></i> Your Answers:</h3>';
+            
+            userAnswers.forEach((answer, index) => {
+                const answerItem = document.createElement('div');
+                answerItem.classList.add('answer-item');
+                answerItem.classList.add(answer.isCorrect ? 'correct' : 'wrong');
+                
+                // Add category icon
+                const categoryIcon = document.createElement('i');
+                categoryIcon.className = `fas ${categoryStyles[answer.category].icon}`;
+                categoryIcon.style.color = categoryStyles[answer.category].color;
+                categoryIcon.style.marginRight = '8px';
+                
+                const questionText = document.createElement('div');
+                questionText.classList.add('answer-question');
+                questionText.appendChild(categoryIcon);
+                questionText.appendChild(document.createTextNode(`${index + 1}. ${answer.question}`));
+                answerItem.appendChild(questionText);
+                
+                if (answer.userAnswer !== null) {
+                    const userAnswerText = document.createElement('div');
+                    userAnswerText.classList.add('answer-user');
+                    userAnswerText.textContent = `Your answer: ${answer.userAnswer}`;
+                    answerItem.appendChild(userAnswerText);
+                } else {
+                    const skippedText = document.createElement('div');
+                    skippedText.classList.add('answer-user');
+                    skippedText.textContent = `You skipped this question`;
+                    answerItem.appendChild(skippedText);
+                }
+                
+                const correctAnswerText = document.createElement('div');
+                correctAnswerText.classList.add('answer-correct');
+                correctAnswerText.textContent = `Correct answer: ${answer.correctAnswer}`;
+                answerItem.appendChild(correctAnswerText);
+                
+                answersSummaryElement.appendChild(answerItem);
+            });
+        }
+
+        // Function to restart the game
+        function restartGame() {
+            resultsContainer.style.display = 'none';
+            setupScreen.style.display = 'block';
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+        }
+
+        // Timer functions
+        function startTimer() {
+            timeLeft = 30;
+            updateTimerDisplay();
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    if (!answered) {
+                        timeUp();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            timeLeftElement.textContent = `${timeLeft}s`;
+            
+            // Change color when time is running low
+            if (timeLeft <= 10) {
+                timeLeftElement.style.color = 'var(--wrong)';
+            } else {
+                timeLeftElement.style.color = 'var(--timer)';
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeftElement.textContent = '30s';
+            timeLeftElement.style.color = 'var(--timer)';
+        }
+
+        function timeUp() {
+            answered = true;
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            document.querySelectorAll('.option-btn').forEach(button => {
+                button.classList.add('disabled');
+                
+                // Highlight correct answer
+                const optionText = button.querySelector('span').textContent;
+                if (optionText === currentQuestion.answer) {
+                    button.classList.add('correct');
+                }
+            });
+            
+            // Record as unanswered
+            userAnswers.push({
+                question: currentQuestion.question,
+                userAnswer: null,
+                correctAnswer: currentQuestion.answer,
+                isCorrect: false,
+                category: selectedCategory
+            });
+            
+            nextBtn.style.display = 'block';
+            skipBtn.style.display = 'none';
+        }
+
+        // Create confetti effect
+        function createConfetti(count = 20) {
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                // Random position and color
+                const colors = ['#f72585', '#4cc9f0', '#4361ee', '#f8961e', '#7209b7'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = randomColor;
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+    </script>
+</body>
+</html>
