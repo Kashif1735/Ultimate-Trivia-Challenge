@@ -28,7 +28,7 @@
             --category-geography: #38b000;
             --category-entertainment: #f72585;
         }
-
+        
         * {
             margin: 0;
             padding: 0;
@@ -2436,6 +2436,13 @@
                 }, 5000);
             }
         }
+          function toggleTheme() {
+            playSound('click');
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            themeToggle.textContent = isDark ? '🌞' : '🌓';
+        }
+
 
         // Utility function to shuffle array
         function shuffleArray(array) {
